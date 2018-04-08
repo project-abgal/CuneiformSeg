@@ -57,24 +57,39 @@ def cropper(image, ansimage, x, y, size, resize):
             anslist.append(ansimage[x[i], y[i]])
     return(np.array(imlist), np.array(anslist))
 
+
 def cropperWithOutBlack(image, ansimage, x, y, size, resize):
     # cropperだが真っ黒のものを抜いて返す
     images, answers = cropper(image, ansimage, x, y, size, resize)
     print("images is", len(images))
     blackpart = np.where(images == 0, 1, 0)
-    notblack = np.where(np.all(np.all(np.all(blackpart,3),2),1)==False)
-    print((np.any(np.any(np.any(blackpart,3),2),1).shape))
+    notblack = np.where(np.all(np.all(np.all(blackpart, 3), 2), 1) == False)
+    print((np.any(np.any(np.any(blackpart, 3), 2), 1).shape))
     print("notblack is ", notblack, len(notblack))
-    images,answers = images[notblack],answers[notblack]
-    return images,answers
+    images, answers = images[notblack], answers[notblack]
+    return images, answers
+
 
 def imageGenerator(imagelist, ansimagelist, size=28, resize=28, division=1000):
     for image, ansimage in zip(imagelist, ansimagelist):
         x, y, _ = slicplus(image, division)
         x, y = x.astype('int32'), y.astype('int32')
-        images, answers = cropperWithOutBlack(image, ansimage, x, y, size, resize)
+        images, answers = cropperWithOutBlack(
+            image, ansimage, x, y, size, resize)
         yield(images, answers)
     return
+
+
+def imageProcessor(imagelist, ansimagelist, size=28, resize=28, division=1000):
+    imgreturn,ansreturn = [],[]
+    for i, (image, ansimage) in enumerate(zip(imagelist, ansimagelist)):
+        x, y, _ = slicplus(image, division)
+        x, y = x.astype('int32'), y.astype('int32')
+        images, answers = cropperWithOutBlack(
+            image, ansimage, x, y, size, resize)
+        imgreturn.extend(images)
+        ansreturn.extend(answers)
+    return np.array(imgreturn), np.array(ansreturn)
 
 
 class Prefetcher(object):
@@ -134,7 +149,7 @@ def visualize(model, image, size=28, resize=28, division=1000, batch_size=128):
 
 if __name__ == "__main__":
     img = cv2.imread("../data/image red/P128014.jpg")[:, :, ::-1]
-    img=redcut(img)
+    img = redcut(img)
     plt.imshow(img)
     plt.show()
     print(img[1682][600])
