@@ -28,6 +28,7 @@ resize = size
 model_size = resize
 num_of_classes = 1
 mod = get_net2(model_size, num_of_classes, session=session)
+mod.load_weights(serv + "/model/model.h5")
 session.run(tf.global_variables_initializer())
 
 # training
