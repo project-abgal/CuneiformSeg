@@ -115,14 +115,14 @@ def visualize(model, image, size=28, resize=28, division=1000, batch_size=128):
 
     def gen(x, y):
         images = []
+        sizehalf = size//2
+        paddedimage=cv2.copyMakeBorder(image,sizehalf,sizehalf,sizehalf,sizehalf,cv2.BORDER_CONSTANT,value=(0,0,0))
         for i, j in zip(tqdm_notebook(x), y):
-            sizehalf = size//2
-            if i-sizehalf >= 0 and j-sizehalf >= 0:
-                images.append(cv2.resize(
-                    squarecut(image, i, j, size), (resize, resize)))
-                if len(images) >= batch_size:
-                    yield [np.array(images)]
-                    images = []
+            images.append(cv2.resize(
+                squarecut(paddedimage, i+sizehalf, j+sizehalf, size), (resize, resize)))
+            if len(images) >= batch_size:
+                yield [np.array(images)]
+                images = []
         if images != []:
             yield [np.array(images)]
         return

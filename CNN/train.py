@@ -7,7 +7,7 @@ import numpy as np
 from glob import glob
 from tqdm import tqdm
 from prefetch_generator import BackgroundGenerator
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, EarlyStopping
 from model import *
 from util import *
 from sklearn.model_selection import train_test_split
@@ -20,6 +20,8 @@ serv = ".."
 import tensorflow as tf
 f_log = './log'
 tb_cb = TensorBoard(log_dir=f_log, histogram_freq=10000, write_graph=False)
+es_cb = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='auto')
+# use this to limit gpu memory to half of it
 # config = tf.ConfigProto(gpu_options=tf.GPUOptions(
 #    per_process_gpu_memory_fraction=0.45))
 #session = tf.Session(config=config)
@@ -44,7 +46,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     imagelist, ansimagelist, test_size=0.10, random_state=42)
 
 
-mod.fit(X_train,y_train, epochs=epochs, shuffle=True, verbose=1,
-        batch_size=128, callbacks=[tb_cb], validation_data=[X_test,y_test])
+mod.fit(X_train, y_train, epochs=epochs, shuffle=True, verbose=1,
+        batch_size=128, callbacks=[tb_cb, es_cb], validation_data=[X_test, y_test])
 mod.save_weights(serv + "/model/model.h5")
 print('done!')
