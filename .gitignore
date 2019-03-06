@@ -3,3 +3,4 @@
 /CNN/*.npy
 /CNN/__pycache__/
 /*/.DS_Store
+/**/*.jpg
