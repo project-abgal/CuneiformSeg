@@ -21,13 +21,14 @@ if __name__ == "__main__":
     x = 0
     y = 0
     for i in range(200):
-        if x+characters[i].shape[0] > imgsize[0]:
-            y += characters[i].shape[1]
+        char_id = np.random.randint(len(characters))
+        if x+characters[char_id].shape[0] > imgsize[0]:
+            y += characters[char_id].shape[1]
             x = 0
-        if y+characters[i].shape[1] > imgsize[1]:
+        if y+characters[char_id].shape[1] > imgsize[1]:
             break
-        subtract_char(img, characters[i], x, y)
-        x += characters[i].shape[0]
+        subtract_char(img, characters[char_id], x, y)
+        x += characters[char_id].shape[0]
 
     # turn around black and white
     img = 255-img
