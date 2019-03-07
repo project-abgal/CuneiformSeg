@@ -29,22 +29,25 @@ if __name__ == "__main__":
         subtract_char(img, characters[i], x, y)
         x += characters[i].shape[0]
 
+    # turn around black and white
+    img = 255-img
+
     #  zoom up image
     zoom = 5
     img = cv2.resize(img, (0, 0), fx=zoom, fy=zoom)
 
-    #  dilate
+    # erode
     kernel = np.ones((2, 2), np.uint8)
-    img = cv2.dilate(img, kernel, iterations=1)
+    #  img = cv2.erode(img, kernel, iterations=3)
 
     #  optional lise detection. doesn't work well.
     detectLines = False
     if detectLines:
-        gray = 255-img
+        gray = img
         minLineLength = 100
         maxLineGap = 1
-        lines = cv2.HoughLinesP(gray, 1, np.pi/360, 100,
-                                minLineLength=minLineLength, maxLineGap=maxLineGap)
+        lines = cv2.HoughLinesP(
+            gray, 1, np.pi/360, 100, minLineLength=minLineLength, maxLineGap=maxLineGap)
         for x1, y1, x2, y2 in lines[:, 0]:
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
