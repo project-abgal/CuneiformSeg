@@ -50,8 +50,10 @@ if __name__ == "__main__":
     iteration = 30
     img = img/iteration
     imgbuf = img
+    sigma = 2
     for i in range(iteration):
-        imgbuf = cv2.dilate(imgbuf, kernel, iterations=2)
+        imgbuf = cv2.GaussianBlur(
+            img, (kernel_size, kernel_size), sigma, sigma)
         #  M = np.float32([[1, 0, -kernel_size//2], [0, 1, -kernel_size//2]])
         #  imgbuf = cv2.warpAffine(imgbuf, M,imgbuf.shape[::-1])
         #  img = np.maximum(img, imgbuf)
