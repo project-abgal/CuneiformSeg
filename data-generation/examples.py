@@ -14,10 +14,10 @@ def subtract_char(background, patch, x, y):
 if __name__ == "__main__":
     characters = [cv2.cvtColor(cv2.imread(name), cv2.COLOR_RGB2GRAY)
                   for name in sorted(glob(path_to_characters+"*/*"))]
-    imgsize = (300, 300)
-    img = np.full(imgsize, 255, np.uint8)
 
     #  print cuneiform characters onto white back
+    imgsize = (300, 300)
+    img = np.full(imgsize, 255, np.uint8)
     x = 0
     y = 0
     for i in range(200):
@@ -56,8 +56,6 @@ if __name__ == "__main__":
         #  img = np.maximum(img, imgbuf)
         img = cv2.addWeighted(img, 1, imgbuf, 1, 0)
 
-
-
     #  optional lise detection. doesn't work well.
     detectLines = False
     if detectLines:
@@ -70,3 +68,4 @@ if __name__ == "__main__":
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
     cv2.imwrite("./out/out.jpg", img)
+
