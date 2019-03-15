@@ -3,6 +3,7 @@ import cv2
 
 if __name__ == "__main__":
 
+    writer = SummaryWriter()
     USE_CUDA = bool(torch.cuda.is_available())
 
     device0 = torch.device("cuda:0" if USE_CUDA else "cpu")
@@ -17,8 +18,11 @@ if __name__ == "__main__":
     generated_image = model.generate(test_image).cpu().numpy()
 
     #  print(generated_image.reshape((generated_image.shape[2], -1)).shape)
-    print(generated_image.reshape(
-        (generated_image.shape[2], -1))[100:200, 200:400])
+    print(generated_image.shape)
 
     cv2.imwrite('./generated_image.jpg',
-                generated_image.reshape((generated_image.shape[2], -1))*255.0)
+                (generated_image.reshape((generated_image.shape[2], -1))+1)*127.0)
+
+    writer.add_image('generated', (generated_image.reshape(
+        (1,generated_image.shape[2], -1))+1)*127.0, 0)
+    writer.close()

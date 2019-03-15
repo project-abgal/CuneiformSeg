@@ -69,15 +69,36 @@ class MiniUNet(nn.Module):
 
 
 class one_color_vgg16(nn.Module):
+    """
+    there is a fatal bug. Do not use.
+    """
 
     def __init__(self, n_channels, n_classes):
-        super(MiniUNet, self).__init__()
+        super(one_color_vgg16, self).__init__()
         self.base_net = models.vgg16_bn()
-        self.base_layers = list(base_net.children())
-        self.layer0 = nn.conv2(n_channels, 64, kernel_size=(3, 3))
-        self.layerother= nn.Sequential(*self.base_layers[1:])
+        self.base_layers = list(self.base_net.children())
+        self.layer0 = nn.Conv2d(n_channels, 64, kernel_size=(3, 3))
+        self.layerother = nn.Sequential(*self.base_layers[1:])
 
     def forward(self, input):
-        x=self.layer0(input)
-        x=self.layerother(x)
-        return sigmoid(x)
+        x = self.layer0(input)
+        x = self.layerother(x)
+        return F.sigmoid(x)
+
+
+class one_color_resnet(nn.Module):
+
+    def __init__(self, n_channels, n_classes):
+        super(one_color_resnet, self).__init__()
+        self.base_net = models.resnet18()
+        self.base_layers = list(self.base_net.children())
+        self.layer0 = nn.Conv2d(n_channels, 64, kernel_size=(
+            7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.layermiddle = nn.Sequential(*self.base_layers[1:-1])
+        self.layerlast = nn.Linear(512, n_classes, bias=True) # have to be changed depending on crop size
+
+    def forward(self, input):
+        x = self.layer0(input)
+        x = self.layermiddle(x)
+        x = F.leaky_relu_(self.layerlast(x.reshape(x.shape[0], -1)))
+        return F.sigmoid(x)

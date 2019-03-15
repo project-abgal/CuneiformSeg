@@ -16,9 +16,13 @@ class TabletDataset(Dataset):
         #      print(name)
         #      cv2.imread(name, 0).astype(np.float32)
         self.img = [cv2.imread(name, 0).astype(np.float32)
-                    for name in sorted(glob(img_path + "/*")) if cv2.imread(name, 0).shape[0] > crop_size[0] and cv2.imread(name, 0).shape[1] > crop_size[1]]
+                    for name in sorted(glob(img_path + "/*"))]
         self.line_img = [cv2.imread(name, 0).astype(np.float32)
-                         for name in sorted(glob(line_img_path + "/*")) if cv2.imread(name, 0).shape[0] > crop_size[0] and cv2.imread(name, 0).shape[1] > crop_size[1]]
+                         for name in sorted(glob(line_img_path + "/*"))]
+        self.img = [item for item in self.img if item.shape[0]
+                    > crop_size[0] and item.shape[1] > crop_size[1]]
+        self.line_img = [item for item in self.line_img if item.shape[0]
+                         > crop_size[0] and item.shape[1] > crop_size[1]]
         self.crop_size = crop_size
 
     def __len__(self):
@@ -34,4 +38,6 @@ class TabletDataset(Dataset):
             y = np.random.randint(imagesize[1]-self.crop_size[1])
         else:
             y = 0
+        #  x=50
+        #  y=50
         return [self.img[idx][x:x+self.crop_size[0], y:y+self.crop_size[1]], self.line_img[idx][x:x+self.crop_size[0], y:y+self.crop_size[1]]]
