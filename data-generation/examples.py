@@ -17,7 +17,7 @@ if __name__ == "__main__":
                   for name in sorted(glob(path_to_characters+"*/*"))]
 
     #  print cuneiform characters onto white back
-    imgsize = (300, 300)
+    imgsize = np.array((300, 300))
     img = np.full(imgsize, 255, np.uint8)
     x = 0
     y = 0
@@ -37,10 +37,14 @@ if __name__ == "__main__":
     #  zoom up image
     zoom = 5
     img = cv2.resize(img, (0, 0), fx=zoom, fy=zoom)
+    imgsize *= zoom
 
-    kernel_size = 5
+    kernel_size = 10
     kernel = cv2.getStructuringElement(
         cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
+    cv2.imwrite("./out/out4.jpg", img)
+    img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+    cv2.imwrite("./out/out.jpg", img)
 
     # erode
     img = cv2.erode(img, kernel, iterations=3)
@@ -70,7 +74,6 @@ if __name__ == "__main__":
     direction_vector = direction_vector.transpose((1, 2, 0))
     print(direction_vector.shape)
     #  print(np.full(imgsize, carving_shallowness, np.uint8).shape)
-    cv2.imwrite("./out/out2.jpg", sobelx)
 
     # assume light is coming from above 60 degrees
     light_direction_vector = np.array((0, -1, np.sqrt(3)))
@@ -94,6 +97,4 @@ if __name__ == "__main__":
             gray, 1, np.pi/360, 100, minLineLength=minLineLength, maxLineGap=maxLineGap)
         for x1, y1, x2, y2 in lines[:, 0]:
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
-
-    cv2.imwrite("./out/out.jpg", img)
 

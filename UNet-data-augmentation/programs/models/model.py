@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .parts import double_conv, down, outconv, inconv, up
-import torch.models as models
+import torchvision.models as models
 
 # reference: https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_model.py
 
@@ -67,3 +67,17 @@ class MiniUNet(nn.Module):
         x = self.outc(x)
         return F.tanh(x)
 
+
+class one_color_vgg16(nn.Module):
+
+    def __init__(self, n_channels, n_classes):
+        super(MiniUNet, self).__init__()
+        self.base_net = models.vgg16_bn()
+        self.base_layers = list(base_net.children())
+        self.layer0 = nn.conv2(n_channels, 64, kernel_size=(3, 3))
+        self.layerother= nn.Sequential(*self.base_layers[1:])
+
+    def forward(self, input):
+        x=self.layer0(input)
+        x=self.layerother(x)
+        return sigmoid(x)

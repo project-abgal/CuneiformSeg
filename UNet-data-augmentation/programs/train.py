@@ -14,7 +14,7 @@ from glob import glob
 
 class generator:
     def __init__(self, in_channels, out_channels, device, use_cuda=False):
-        self.generatorNet = UNet(${1:n_channels}, ${2:n_classes}, ${3:bilinear})$0(in_channels, out_channels, True)
+        self.generatorNet = UNet(in_channels, out_channels, True)
         self.discriminatorNet = models.vgg16_bn()
         if use_cuda:
             self.generatorNet = self.generatorNet.cuda(device)
