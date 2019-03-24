@@ -26,16 +26,31 @@ def canny_edge(img):
 
 
 def ridge(img):
-    img = img.copy()
+    outimg = img.copy()
     sigmaX = 1
     sigmaY = 1
 
-    img = cv2.GaussianBlur(img, ksize=(9, 9), sigmaX=sigmaX, sigmaY=sigmaY)
-    filter_ = cv2.ximgproc.RidgeDetectionFilter_create(
+    outimg = cv2.GaussianBlur(outimg, ksize=(
+        9, 9), sigmaX=sigmaX, sigmaY=sigmaY)
+    ridge_detection_filter = cv2.ximgproc.RidgeDetectionFilter_create(
         ksize=3, dx=1, dy=1)
-    img = filter_.getRidgeFilteredImage(img)
-    img = cv2.morphologyEx(img, cv2.MORPH_OPEN, np.ones((3, 3)))
+    outimg = ridge_detection_filter.getRidgeFilteredImage(outimg)
+    outimg = cv2.morphologyEx(outimg, cv2.MORPH_OPEN, np.ones((3, 3)))
+    cv2.imwrite("./out/out6.jpg", outimg)
     #  img = cv2.erode(img, kernel=np.ones((3,3)))
+    mser = cv2.MSER_create(_min_area=100, _max_area=500, _max_variation=0.1)
+    regions, _ = mser.detectRegions(255-outimg)
+    hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
+    cv2.polylines(img, hulls, 1, (0, 255, 0))
+    return img
+
+
+def mser(img):
+    outimg = img.copy()
+    mser = cv2.MSER_create()
+    regions, _ = mser.detectRegions(outimg)
+    hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
+    cv2.polylines(img, hulls, 1, (0, 255, 0))
     return img
 
 
@@ -43,6 +58,8 @@ if __name__ == "__main__":
     #  img = cv2.imread('../data/image/P499212.jpg')
     img = cv2.imread('../data-collection/images/P100004.jpg')
     kernel_size = 3
+    print(img.shape)
     #  img = canny_edge(img)
     img = ridge(img)
+    #  img = mser(img)
     cv2.imwrite("./out/out5.jpg", img)
