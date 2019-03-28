@@ -30,18 +30,37 @@ def ridge(img):
     sigmaX = 1
     sigmaY = 1
 
+    # preprocessing
     outimg = cv2.GaussianBlur(outimg, ksize=(
         9, 9), sigmaX=sigmaX, sigmaY=sigmaY)
+
+    # ridge detection
     ridge_detection_filter = cv2.ximgproc.RidgeDetectionFilter_create(
         ksize=3, dx=1, dy=1)
     outimg = ridge_detection_filter.getRidgeFilteredImage(outimg)
+
+    # postprocessing
     outimg = cv2.morphologyEx(outimg, cv2.MORPH_OPEN, np.ones((3, 3)))
-    cv2.imwrite("./out/out6.jpg", outimg)
+    #  _, outimg = cv2.threshold(outimg, 127, 255, cv2.THRESH_BINARY)
+    #  _, outimg = cv2.threshold(outimg, 127, 255, cv2.THRESH_TOZERO)
     #  img = cv2.erode(img, kernel=np.ones((3,3)))
-    mser = cv2.MSER_create(_min_area=100, _max_area=500, _max_variation=0.1)
+
+    # line detection
+    #  lines = cv2.HoughLinesP(outimg, rho=1, theta=np.pi/180,
+    #                          threshold=100, minLineLength=10)
+    #  print(lines.shape)
+    #  for line in lines:
+    #      for x1, y1, x2, y2 in line:
+    #          cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
+
+    cv2.imwrite("./out/out6.jpg", outimg)
+
+    #  mser area detection
+    mser = cv2.MSER_create(_min_area=1000, _max_area=6000, _max_variation=0.1)
     regions, _ = mser.detectRegions(255-outimg)
     hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
     cv2.polylines(img, hulls, 1, (0, 255, 0))
+
     return img
 
 
